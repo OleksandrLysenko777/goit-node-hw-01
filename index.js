@@ -1,35 +1,59 @@
-const { Command } = require("commander");
-const contacts = require("./contacts");
+import { Command } from "commander";
+import * as contacts from "./contacts.js";
 
 const program = new Command();
 program
   .option(
-    "-a, --action <string>",
+    "-a, --action <type>",
     "choose action: list, get -i, add -n -e -p, remove -i"
   )
-  .option("-i, --id <string>", "user id")
-  .option("-n, --name <string>", "user name")
-  .option("-e, --email <string>", "user email")
-  .option("-p, --phone <string>", "user phone");
+  .option("-i, --id <type>", "user id")
+  .option("-n, --name <type>", "user name")
+  .option("-e, --email <type>", "user email")
+  .option("-p, --phone <type>", "user phone");
 
 program.parse(process.argv);
 
 const argv = program.opts();
 
-function invokeAction({ action, id, name, email, phone }) {
+async function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
     case "list":
-      contacts.listContacts();
+      try {
+        const allContacts = await contacts.listContacts();
+        console.table(allContacts);
+      } catch (error) {
+        console.log(error.message.red);
+      }
       break;
+
     case "get":
-      contacts.getContactById(id);
+      try {
+        const contact = await contacts.getContactById(id);
+        console.log(contact || null);
+      } catch (error) {
+        console.log(error.message.red);
+      }
       break;
+
     case "add":
-      contacts.addContact(name, email, phone);
+      try {
+        const newContact = await contacts.addContact(name, email, phone);
+        console.log(newContact);
+      } catch (error) {
+        console.log(error.message.red);
+      }
       break;
+
     case "remove":
-      contacts.removeContact(id);
+      try {
+        const removedContact = await contacts.removeContact(id);
+        console.log(removedContact || null);
+      } catch (error) {
+        console.log(error.message.red);
+      }
       break;
+
     default:
       console.warn("\x1B[31m Unknown action type!");
   }
