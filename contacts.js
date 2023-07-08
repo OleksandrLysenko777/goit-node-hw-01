@@ -38,9 +38,9 @@ export async function removeContact(contactId) {
     const contacts = parseContacts(data);
     const contactIndex = contacts.findIndex((c) => c.id === contactId);
     if (contactIndex !== -1) {
-      contacts.splice(contactIndex, 1);
+      const [removedContact] = contacts.splice(contactIndex, 1);
       await fs.writeFile(contactsPath, JSON.stringify(contacts));
-      return `Contact with the id ${contactId} has been removed.`.green;
+      return removedContact;
     } else {
       return null;
     }
